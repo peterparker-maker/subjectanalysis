@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>108課綱國小階段課程評鑑設計系統</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body {
+            font-family: 'Microsoft JhengHei', Arial, sans-serif;
+            max-width: 100%;
+            margin: 0 auto;
+            padding: 15px;
+            background-color: #f5f5f5;
+        }
+        
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .help-btn {
+            background-color: white;
+            color: #7f8c8d;
+            border: 1px solid #ddd;
+            padding: 5px 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            width: 2cm;
+            height: 1cm;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 0;
+            font-size: 22px;
+            flex-grow: 1;
+        }
+        
+        .designer {
+            color: #999;
+            font-size: 14px;
+            text-align: right;
+            margin-left: 20px;
+        }
+        
+        .form-container {
+            background-color: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        select {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            margin: 10px 0;
+            font-size: 16px;
+        }
+        .footer {
+            margin-top: 20px;
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+        .checkbox-group {
+            margin-bottom: 10px;
+        }
+        .checkbox-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 5px;
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+        .checkbox-item label {
+            margin-left: 5px;
+            font-weight: normal;
+        }
+        .section-title {
+            background-color: #f0f0f0;
+            padding: 8px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+        .sub-section {
+            padding-left: 10px;
+            margin-bottom: 15px;
+        }
+        .multi-select-group {
+            margin-bottom: 15px;
+        }
+        .select-container {
+            margin-bottom: 8px;
+        }
+        .select-label {
+            display: inline-block;
+            width: 60px;
+            font-weight: bold;
+            color: #555;
+            margin-right: 5px;
+        }
+        
+        /* 答案區域的樣式 */
+        #answer-section {
+            display: none; /* 初始時隱藏 */
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 800px;
+            max-height: 80vh;
+            overflow-y: auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        
+        .overlay {
+            display: none; /* 初始時隱藏 */
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+        }
+        
+        .answer-content {
+            margin-bottom: 20px;
+        }
+        
+        .answer-item {
+            margin-bottom: 15px;
+        }
+        
+        .answer-item h3 {
+            margin-bottom: 8px;
+            color: #2c3e50;
+            font-size: 18px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        
+        .answer-item p {
+            margin: 5px 0;
+            padding-left: 10px;
+        }
+        
+        .answer-item strong {
+            color: #3498db;
+        }
+        
+        #return-btn {
+            background-color: #2ecc71;
+        }
+        
+        .answer-item ul {
+            margin-top: 5px;
+            margin-bottom: 10px;
+            padding-left: 30px;
+        }
+        
+        .answer-item li {
+            margin-bottom: 5px;
+        }
+        
+        /* 說明彈窗樣式 */
+        .help-modal {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80%;
+            max-width: 600px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+        
+        .help-modal h2 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            text-align: center;
+        }
+        
+        .help-content {
+            margin-bottom: 20px;
+        }
+        
+        .help-content p {
+            margin: 10px 0;
+            line-height: 1.5;
+        }
+        
+        .help-content .highlight {
+            font-size: 1.5em;
+            font-weight: bold;
+        }
+        
+        .help-content .red {
+            color: red;
+        }
+        
+        .close-btn {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+    <div class="header-container">
+        <button class="help-btn" id="help-btn">說明</button>
+        <h1>108課綱國小階段課程評鑑設計系統</h1>
+        <div class="designer">繁華國小研發組</div>
+    </div>
+    
+    <div class="form-container">
+        <!-- 1. 科目 -->
+        <div class="form-group">
+            <label for="subject">科目：</label>
+            <select id="subject">
+                <option value="">請選擇科目</option>
+                <option value="chinese">國語</option>
+                <option value="math">數學</option>
+                <option value="english">英語文</option>
+            </select>
+        </div>
+        
+        <!-- 2. 本領域欲加強的重點 -->
+        <div class="form-group">
+            <label for="focus-area">本領域欲加強的重點：</label>
+            <select id="focus-area">
+                <option value="">請先選擇科目</option>
+            </select>
+        </div>
+        
+        <!-- 3. 年級 -->
+        <div class="form-group">
+            <label for="grade">年級：</label>
+            <select id="grade">
+                <option value="">請先選擇科目</option>
+            </select>
+        </div>
+        
+        <!-- 4. 學生現況 -->
+        <div class="form-group">
+            <label>學生現況：</label>
+            
+            <div class="sub-section">
+                <div class="section-title">優勢（學生在此項目表現不錯）</div>
+                <div class="checkbox-container" id="strength-container">
+                    <!-- 動態生成選項 -->
+                </div>
+            </div>
+            
+            <div class="sub-section">
+                <div class="section-title">弱勢（學生在此項目上尚待加強）</div>
+                <div class="checkbox-container" id="weakness-container">
+                    <!-- 動態生成選項 -->
+                </div>
+            </div>
+        </div>
+        
+        <button id="loadBtn" type="button">載入資料</button>
+        
+        <!-- 5. 核心素養 (修改為三個下拉選單) -->
+        <div class="form-group">
+            <label>核心素養：</label>
+            <div class="multi-select-group">
+                <div class="select-container">
+                    <span class="select-label">素養一：</span>
+                    <select id="competency1" class="competency-select">
+                        <option value="">請先載入資料</option>
+                    </select>
+                </div>
+                <div class="select-container">
+                    <span class="select-label">素養二：</span>
+                    <select id="competency2" class="competency-select">
+                        <option value="">請先載入資料</option>
+                    </select>
+                </div>
+                <div class="select-container">
+                    <span class="select-label">素養三：</span>
+                    <select id="competency3" class="competency-select">
+                        <option value="">請先載入資料</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 6. 學習表現 (修改為三個下拉選單) -->
+        <div class="form-group">
+            <label>學習表現：</label>
+            <div class="multi-select-group">
+                <div class="select-container">
+                    <span class="select-label">表現一：</span>
+                    <select id="performance1" class="performance-select">
+                        <option value="">請先載入資料</option>
+                    </select>
+                </div>
+                <div class="select-container">
+                    <span class="select-label">表現二：</span>
+                    <select id="performance2" class="performance-select">
+                        <option value="">請先載入資料</option>
+                    </select>
+                </div>
+                <div class="select-container">
+                    <span class="select-label">表現三：</span>
+                    <select id="performance3" class="performance-select">
+                        <option value="">請先載入資料</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 7. 學習內容 (修改為三個下拉選單) -->
+        <div class="form-group">
+            <label>學習內容：</label>
+            <div class="multi-select-group">
+                <div class="select-container">
+                    <span class="select-label">內容一：</span>
+                    <select id="content1" class="content-select">
+                        <option value="">請先載入資料</option>
+                    </select>
+                </div>
+                <div class="select-container">
+                    <span class="select-label">內容二：</span>
+                    <select id="content2" class="content-select">
+                        <option value="">請先載入資料</option>
+                    </select>
+                </div>
+                <div class="select-container">
+                    <span class="select-label">內容三：</span>
+                    <select id="content3" class="content-select">
+                        <option value="">請先載入資料</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 8. 素養導向教學檢核 -->
+        <div class="form-group">
+            <label>素養導向教學檢核：</label>
+            <div class="checkbox-container">
+                <div class="checkbox-item">
+                    <input type="checkbox" id="check-1" name="teaching-check" value="content-alignment">
+                    <label for="check-1">教學內容呼應核心素養與學習重點</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="check-2" name="teaching-check" value="context-based">
+                    <label for="check-2">教學內容符應具情境化，脈絡化，意義化，及適性化教學</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="check-3" name="teaching-check" value="student-centered">
+                    <label for="check-3">以學生為中心的教學策略（提供操作，體驗，思考，探究，發表等）</label>
+                </div>
+                <div class="checkbox-item">
+                    <input type="checkbox" id="check-4" name="teaching-check" value="assessment-alignment">
+                    <label for="check-4">評量內容與方式符應學習目標</label>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 新增確定按鈕 -->
+        <button id="submitBtn" type="button">確定</button>
+    </div>
+    
+    <!-- 遮罩層 -->
+    <div class="overlay" id="overlay"></div>
+    
+    <!-- 答案區域 -->
+    <div id="answer-section">
+        <h2>課程評鑑結果</h2>
+        <div class="answer-content" id="answer-content">
+            <!-- 這裡會動態填充內容 -->
+        </div>
+        <button id="return-btn" type="button">返回</button>
+    </div>
+    
+    <!-- 說明彈窗 -->
+    <div class="help-modal" id="help-modal">
+        <h2>填寫說明</h2>
+        <div class="help-content">
+            <p>1. 請老師先選擇要填寫的科目</p>
+            <p>2. 選擇該領域要加強的重點(指標出自學力檢測的評量向度，若老師覺得不符合可自行填寫)</p>
+            <p>3. 選擇年級(此項目請老師跨年級填寫，和課程計畫相同)</p>
+            <p>目前一年級的老師-->選<span class="red">二</span>年級填寫，目前二年級的老師-->選<span class="red">一</span>年級填寫</p>
+            <p>目前三年級的老師-->選<span class="red">四</span>年級填寫，目前四年級的老師-->選<span class="red">三</span>年級填寫</p>
+            <p>目前五年級的老師-->選<span class="red">六</span>年級填寫，目前六年級的老師-->選<span class="red">五</span>年級填寫</p>
+            <p>4. 學生現況</p>
+            <p>優勢、弱勢可對照學力檢測成績、學習扶助、定期評量做為參考依據</p>
+            <p>跨年段的老師(要填寫一、三、五的老師)，資料若無法參照，可用平時學生易錯章節作為參考依據</p>
+            <p class="highlight">點選載入按鈕</p>
+            <p>選擇核心素養-(對應要加強的重點及學生弱勢)</p>
+            <p>選擇學習表現-(對應要加強的重點及學生弱勢)</p>
+            <p>選擇學習內容-(對應要加強的重點及學生弱勢)</p>
+            <p>教學檢核請老師自行勾選</p>
+            <p class="highlight">確定後將結果頁面複製到課程評鑑設計表件上</p>
+        </div>
+        <button class="close-btn" id="close-help-btn">關閉</button>
+    </div>
+    
+    <div class="footer">
+        <p>108課綱國小階段課程評鑑設計系統</p>
+    </div>
+</body>
+<script>
+    $(document).ready(function() {
+        // ========================= 國語資料庫 =========================
+        // 國語重點項目
+        var chineseFocusItems = [
+            { value: "phonetic", text: "形音知識" },
+            { value: "vocabulary", text: "字詞知識" },
+            { value: "grammar", text: "語法知識" },
+            { value: "rhetoric", text: "修辭知識" },
+            { value: "structure", text: "章法知識" },
+            { value: "genre", text: "文體知識" },
+            { value: "word-comprehension", text: "字詞理解" },
+            { value: "sentence-comprehension", text: "句子理解" },
+            { value: "paragraph-comprehension", text: "段落理解" },
+            { value: "text-comprehension", text: "篇章理解" }
+        ];
+
+        // 國語優勢/弱勢項目
+        var chineseStrengthWeaknessItems = [
+            { value: "phonetic", text: "形音知識" },
+            { value: "vocabulary", text: "字詞知識" },
+            { value: "grammar", text: "語法知識" },
+            { value: "rhetoric", text: "修辭知識" },
+            { value: "structure", text: "章法知識" },
+            { value: "genre", text: "文體知識" },
+            { value: "word-comprehension", text: "字詞理解" },
+            { value: "sentence-comprehension", text: "句子理解" },
+            { value: "paragraph-comprehension", text: "段落理解" },
+            { value: "text-comprehension", text: "篇章理解" }
+        ];
+
+        // 國語核心素養
+        var chineseCoreCompetencies = [
+            { id: "國-E-A1", content: "認識國語文的重要性，培養國語文的興趣，能運用國語文認識自我、表現自我，奠定終身學習的基礎。" },
+            { id: "國-E-A2", content: "透過國語文學習，掌握文本要旨、發展學習及解決問題策略、初探邏輯思維，並透過體驗與實踐，處理日常生活問題。" },
+            { id: "國-E-A3", content: "運用國語文充實生活經驗，學習有步驟的規劃活動和解決問題，並探索多元知能，培養創新精神，以增進生活適應力。" },
+            { id: "國-E-B1", content: "理解與運用國語文在日常生活中學習體察他人的感受，並給予適當的回應，以達成溝通及互動的目標。" },
+            { id: "國-E-B2", content: "理解網際網路和資訊科技對學習的重要性，藉以擴展語文學習的範疇，並培養審慎使用各類資訊的能力。" },
+            { id: "國-E-B3", content: "體驗生活中語言文字的美感，以及文學作品中的美感意境，欣賞與珍惜本國及世界各地多元文化的美感表現。" },
+            { id: "國-E-C1", content: "閱讀各類文本，從中培養是非判斷的能力，以了解自己與所處社會的關係，培養同理心與責任感，關懷自然生態與增進公民意識。" },
+            { id: "國-E-C2", content: "與他人互動時，能適切運用語文能力表達個人想法，理解與包容不同意見，樂於參與學校及社區活動，體會團隊合作的重要性。" },
+            { id: "國-E-C3", content: "閱讀各類文本，培養理解與關心本土及國際事務的基本素養，以認同自我文化，並能尊重並欣賞多元文化。" }
+        ];
+
+        // 國語學習表現 - 第一學習階段（國小1-2年級）
+        var chinesePerformanceStage1 = [
+            // 聆聽
+            { id: "1-Ⅰ-1", content: "養成專心聆聽的習慣，尊重對方的發言。" },
+            { id: "1-Ⅰ-2", content: "能學習聆聽不同的媒材，說出聆聽的內容。" },
+            { id: "1-Ⅰ-3", content: "能理解話語、詩歌、故事的訊息，有適切的表情跟肢體語言。" },
+            
+            // 口語表達
+            { id: "2-Ⅰ-1", content: "以正確發音流利的說出語意完整的話。" },
+            { id: "2-Ⅰ-2", content: "說出所聽聞的內容。" },
+            { id: "2-Ⅰ-3", content: "與他人交談時，能適當的提問、合宜的回答，並分享想法。" },
+            
+            // 標音符號與運用
+            { id: "3-Ⅰ-1", content: "正確認念、拼讀及書寫注音符號。" },
+            { id: "3-Ⅰ-2", content: "運用注音符號輔助識字，也能利用國字鞏固注音符號的學習。" },
+            { id: "3-Ⅰ-3", content: "運用注音符號表達想法，記錄訊息。" },
+            { id: "3-Ⅰ-4", content: "利用注音讀物，學習閱讀，享受閱讀樂趣。" },
+            
+            // 識字與寫字
+            { id: "4-Ⅰ-1", content: "認識常用國字至少1,000字，使用700字。" },
+            { id: "4-Ⅰ-2", content: "利用部件、部首或簡單造字原理，輔助識字。" },
+            { id: "4-Ⅰ-3", content: "學習查字典的方法。" },
+            { id: "4-Ⅰ-4", content: "養成良好的書寫姿勢，並保持整潔的書寫習慣。" },
+            { id: "4-Ⅰ-5", content: "認識基本筆畫、筆順，掌握運筆原則，寫出正確及工整的國字。" },
+            { id: "4-Ⅰ-6", content: "能因應需求，感受寫字的溝通功能與樂趣。" },
+            
+            // 閱讀
+            { id: "5-Ⅰ-1", content: "以適切的速率正確地朗讀文本。" },
+            { id: "5-Ⅰ-2", content: "認識常用標點符號。" },
+            { id: "5-Ⅰ-3", content: "讀懂與學習階段相符的文本。" },
+            { id: "5-Ⅰ-4", content: "了解文本中的重要訊息與觀點。" },
+            { id: "5-Ⅰ-5", content: "認識簡易的記敘、抒情及應用文本的特徵。" },
+            { id: "5-Ⅰ-6", content: "利用圖像、故事結構等策略，協助文本的理解與內容重述。" },
+            { id: "5-Ⅰ-7", content: "運用簡單的預測、推論等策略，找出句子和段落明示的因果關係，理解文本內容。" },
+            { id: "5-Ⅰ-8", content: "認識圖書館(室)的功能。" },
+            { id: "5-Ⅰ-9", content: "喜愛閱讀，並樂於與他人分享閱讀心得。" },
+            
+            // 寫作
+            { id: "6-Ⅰ-1", content: "根據表達需要，使用常用標點符號。" },
+            { id: "6-Ⅰ-2", content: "學習故事，說出故事的要素。" },
+            { id: "6-Ⅰ-3", content: "寫出語意完整的句子、主題明確的段落。" },
+            { id: "6-Ⅰ-4", content: "使用仿寫、接寫等技巧寫作。" },
+            { id: "6-Ⅰ-5", content: "修改文句的錯誤。" },
+            { id: "6-Ⅰ-6", content: "培養寫作的興趣。" }
+        ];
+        
+        // 國語學習表現 - 第二學習階段（國小3-4年級）
+        var chinesePerformanceStage2 = [
+            // 聆聽
+            { id: "1-Ⅱ-1", content: "聆聽時能讓對方充分表達意見。" },
+            { id: "1-Ⅱ-2", content: "具備聆聽不同媒材的基本能力。" },
+            { id: "1-Ⅱ-3", content: "聽懂適合程度的詩歌、戲劇，並說出聆聽內容的要點。" },
+            { id: "1-Ⅱ-4", content: "根據話語情境，分辨內容是否切題，理解主要內容和情感，並與對方互動。" },
+            
+            // 口語表達
+            { id: "2-Ⅱ-1", content: "用清晰語音、適當語速和音量說話。" },
+            { id: "2-Ⅱ-2", content: "運用適當詞語、正確語法表達想法。" },
+            { id: "2-Ⅱ-3", content: "把握說話的重點與順序，對談時能做適當的回應。" },
+            { id: "2-Ⅱ-4", content: "樂於參加討論，提供個人的觀點和意見。" },
+            { id: "2-Ⅱ-5", content: "與他人溝通時能注重禮貌，並養成說話負責的態度。" },
+            
+            // 標音符號與運用
+            { id: "3-Ⅱ-1", content: "運用注音符號，理解生字新詞，提升閱讀效能。" },
+            { id: "3-Ⅱ-2", content: "運用注音符號，檢索資訊，吸收新知。" },
+            
+            // 識字與寫字
+            { id: "4-Ⅱ-1", content: "認識常用國字至少1,800字，使用1,200字。" },
+            { id: "4-Ⅱ-2", content: "利用共同部件，擴充識字量。" },
+            { id: "4-Ⅱ-3", content: "會利用書面或數位方式查字辭典，並能利用字辭典，分辨字詞義。" },
+            { id: "4-Ⅱ-4", content: "能分辨形近、音近字詞，並正確使用。" },
+            { id: "4-Ⅱ-5", content: "利用字義推論詞義。" },
+            { id: "4-Ⅱ-6", content: "掌握偏旁變化和間架結構要領書寫正確及工整的硬筆字。" },
+            { id: "4-Ⅱ-7", content: "習寫以硬筆字為主，毛筆為輔，掌握楷書筆畫的書寫方法。" },
+            { id: "4-Ⅱ-8", content: "知道古今書法名家的故事。" },
+            
+            // 閱讀
+            { id: "5-Ⅱ-1", content: "以適切的速率朗讀文本，表現抑揚頓挫與情感。" },
+            { id: "5-Ⅱ-2", content: "理解各種標點符號的用法。" },
+            { id: "5-Ⅱ-3", content: "讀懂與學習階段相符的文本。" },
+            { id: "5-Ⅱ-4", content: "掌握句子和段落的意義與主要概念。" },
+            { id: "5-Ⅱ-5", content: "認識記敘、抒情、說明及應用文本的特徵。" },
+            { id: "5-Ⅱ-6", content: "運用適合學習階段的摘要策略，擷取大意。" },
+            { id: "5-Ⅱ-7", content: "就文本的觀點，找出支持的理由。" },
+            { id: "5-Ⅱ-8", content: "運用預測、推論、提問等策略，增進對文本的理解。" },
+            { id: "5-Ⅱ-9", content: "覺察自己的閱讀理解情況，適時調整策略。" },
+            { id: "5-Ⅱ-10", content: "透過大量閱讀，體會閱讀的樂趣。" },
+            { id: "5-Ⅱ-11", content: "閱讀多元文本，以認識議題。" },
+            { id: "5-Ⅱ-12", content: "主動參與班級、學校或社區的閱讀社群活動。" },
+            
+            // 寫作
+            { id: "6-Ⅱ-1", content: "根據標點符號，判斷句意，並讀出正確語調。" },
+            { id: "6-Ⅱ-2", content: "培養思考力、聯想力等寫作基本能力。" },
+            { id: "6-Ⅱ-3", content: "掌握寫作步驟，寫出表達清楚、段落分明、符合主題的作品。" },
+            { id: "6-Ⅱ-4", content: "書寫記敘、應用、說明事物的作品。" },
+            { id: "6-Ⅱ-5", content: "修改、潤飾自己的作品，使表達更適切明白。" },
+            { id: "6-Ⅱ-6", content: "運用改寫、縮寫、擴寫等技巧寫作。" },
+            { id: "6-Ⅱ-7", content: "對文章內容作簡要引用。" },
+            { id: "6-Ⅱ-8", content: "養成珍惜文稿的態度。" },
+            { id: "6-Ⅱ-9", content: "有積極的寫作態度。" }
+        ];
+        
+        // 國語學習表現 - 第三學習階段（國小5-6年級）
+        var chinesePerformanceStage3 = [
+            // 聆聽
+            { id: "1-Ⅲ-1", content: "能夠聆聽他人的發言，並簡要記錄。" },
+            { id: "1-Ⅲ-2", content: "根據演講、新聞話語情境及其情感，聽出不同語氣，理解對方所傳達的情意，表現適切的回應。" },
+            { id: "1-Ⅲ-3", content: "判斷聆聽內容的合理性，並分辨事實或意見。" },
+            { id: "1-Ⅲ-4", content: "結合科技與資訊，提升聆聽的效能。" },
+            
+            // 口語表達
+            { id: "2-Ⅲ-1", content: "觀察生活情境的變化，培養個人感受和思維能力，積累說話材料。" },
+            { id: "2-Ⅲ-2", content: "從聽聞內容進行判斷和提問，並做合理的應對。" },
+            // 口語表達 (續)
+            { id: "2-Ⅲ-3", content: "靈活運用詞句和說話技巧，豐富表達內容。" },
+            { id: "2-Ⅲ-4", content: "運用語調、表情和肢體等變化輔助口語表達。" },
+            { id: "2-Ⅲ-5", content: "把握說話內容的主題、重要細節與結構邏輯。" },
+            { id: "2-Ⅲ-6", content: "結合科技與資訊，提升表達的效能。" },
+            { id: "2-Ⅲ-7", content: "與他人溝通時能尊重不同意見。" },
+            
+            // 識字與寫字
+            { id: "4-Ⅲ-1", content: "認識常用國字至少2,700字，使用2,200字。" },
+            { id: "4-Ⅲ-2", content: "認識文字的字形結構，運用字的部件了解文字的字音與字義。" },
+            { id: "4-Ⅲ-3", content: "運用字辭典、成語辭典等，擴充詞彙，分辨詞義。" },
+            { id: "4-Ⅲ-4", content: "精熟偏旁變化和間架結構要領書寫正確及工整的硬筆字。" },
+            { id: "4-Ⅲ-5", content: "習寫以硬筆字為主，毛筆為輔，掌握楷書形體結構的書寫方法。" },
+            
+            // 閱讀
+            { id: "5-Ⅲ-1", content: "流暢朗讀各類文本，並表現抑揚頓挫的變化。" },
+            { id: "5-Ⅲ-2", content: "理解各種標點符號的用法與表達效果。" },
+            { id: "5-Ⅲ-3", content: "讀懂與學習階段相符的文本。" },
+            { id: "5-Ⅲ-4", content: "區分文本中的客觀事實與主觀判斷之間的差別。" },
+            { id: "5-Ⅲ-5", content: "認識議論文本的特徵。" },
+            { id: "5-Ⅲ-6", content: "熟習適合學習階段的摘要策略，擷取大意。" },
+            { id: "5-Ⅲ-7", content: "連結相關的知識和經驗，提出自己的觀點，評述文本的內容。" },
+            { id: "5-Ⅲ-8", content: "運用自我提問、推論等策略，推論文本隱含的因果訊息或觀點。" },
+            { id: "5-Ⅲ-9", content: "因應不同的目的，運用不同的閱讀策略。" },
+            { id: "5-Ⅲ-10", content: "結合自己的特長和興趣，主動尋找閱讀材料。" },
+            { id: "5-Ⅲ-11", content: "大量閱讀多元文本，辨識文本中議題的訊息或觀點。" },
+            { id: "5-Ⅲ-12", content: "運用圖書館(室)、科技與網路，進行資料蒐集、解讀與判斷，提升多元文本的閱讀和應用能力。" },
+            
+            // 寫作
+            { id: "6-Ⅲ-1", content: "根據表達需要，使用適切的標點符號。" },
+            { id: "6-Ⅲ-2", content: "培養思考力、聯想力等寫作基本能力。" },
+            { id: "6-Ⅲ-3", content: "掌握寫作步驟，寫出表達清楚、段落分明、符合主題的作品。" },
+            { id: "6-Ⅲ-4", content: "創作童詩及故事。" },
+            { id: "6-Ⅲ-5", content: "書寫說明事理、議論的作品。" },
+            { id: "6-Ⅲ-6", content: "練習各種寫作技巧。" },
+            { id: "6-Ⅲ-7", content: "修改、潤飾作品內容。" },
+            { id: "6-Ⅲ-8", content: "建立適切的寫作態度。" }
+        ];
+
+        // 國語學習內容 - 第一學習階段（國小1-2年級）
+        var chineseContentStage1 = [
+            // 標音符號
+            { id: "Aa-I-1", content: "聲符、韻符、介符的正確發音和寫法。" },
+            { id: "Aa-I-2", content: "聲調及其正確的標注方式。" },
+            { id: "Aa-I-3", content: "二拼音和三拼音的拼讀和書寫。" },
+            { id: "Aa-I-4", content: "結合韻的拼讀和書寫。" },
+            { id: "Aa-I-5", content: "標注注音符號的各類文本。" },
+            
+            // 字詞
+            { id: "Ab-I-1", content: "1,000個常用字的字形、字音和字義。" },
+            { id: "Ab-I-2", content: "700個常用字的使用。" },
+            { id: "Ab-I-3", content: "常用字筆畫及部件的空間結構。" },
+            { id: "Ab-I-4", content: "常用字部首的表義（分類）功能。" },
+            { id: "Ab-I-5", content: "1,500個常用語詞的認念。" },
+            { id: "Ab-I-6", content: "1,000個常用語詞的使用。" },
+            
+            // 句段
+            { id: "Ac-I-1", content: "常用標點符號。" },
+            { id: "Ac-I-2", content: "簡單的基本句型。" },
+            { id: "Ac-I-3", content: "基本文句的語氣與意義。" },
+            
+            // 篇章
+            { id: "Ad-I-1", content: "自然段。" },
+            { id: "Ad-I-2", content: "篇章的大意。" },
+            { id: "Ad-I-3", content: "故事、童詩等。" },
+            
+            // 記敘文本
+            { id: "Ba-I-1", content: "順敘法。" },
+            
+            // 抒情文本
+            { id: "Bb-I-1", content: "自我情感的表達。" },
+            { id: "Bb-I-2", content: "人際交流的情感。" },
+            { id: "Bb-I-3", content: "對物或自然的感受。" },
+            { id: "Bb-I-4", content: "直接抒情。" },
+            
+            // 應用文本
+            { id: "Be-I-1", content: "在生活應用方面，如自我介紹、日記的格式與寫作方法。" },
+            { id: "Be-I-2", content: "在人際溝通方面，以書信、卡片等慣用語彙及書寫格式為主。" },
+            
+            // 物質文化
+            { id: "Ca-I-1", content: "各類文本中與日常生活相關的文化內涵。" },
+            // 社群文化
+            { id: "Cb-I-1", content: "各類文本中的親屬關係、道德倫理、儀式風俗等文化內涵。" },
+            { id: "Cb-I-2", content: "各類文本中所反映的個人與家庭、鄉里的關係。" },
+            
+            // 精神文化
+            { id: "Cc-I-1", content: "各類文本中的藝術、信仰、思想等文化內涵。" }
+        ];
+        
+        // 國語學習內容 - 第二學習階段（國小3-4年級）
+        var chineseContentStage2 = [
+            // 標音符號
+            { id: "Aa-Ⅱ-1", content: "標注注音符號的各類文本。" },
+            
+            // 字詞
+            { id: "Ab-Ⅱ-1", content: "1,800個常用字的字形、字音和字義。" },
+            { id: "Ab-Ⅱ-2", content: "1,200個常用字的使用。" },
+            { id: "Ab-Ⅱ-3", content: "常用字部首及部件的表音及表義功能。" },
+            { id: "Ab-Ⅱ-4", content: "多音字及多義字。" },
+            { id: "Ab-Ⅱ-5", content: "3,000個常用語詞的認念。" },
+            { id: "Ab-Ⅱ-6", content: "2,000常用語詞的使用。" },
+            { id: "Ab-Ⅱ-7", content: "國字組成詞彙的構詞規則。" },
+            { id: "Ab-Ⅱ-8", content: "詞類的分辨。" },
+            { id: "Ab-Ⅱ-9", content: "量詞的運用。" },
+            { id: "Ab-Ⅱ-10", content: "字辭典的運用。" },
+            { id: "Ab-Ⅱ-11", content: "筆墨紙硯的使用方法。" },
+            { id: "Ab-Ⅱ-12", content: "楷書基本筆畫運筆方法。" },
+            { id: "Ab-Ⅱ-13", content: "書法名家故事。" },
+            
+            // 句段
+            { id: "Ac-Ⅱ-1", content: "各種標點符號的用法。" },
+            { id: "Ac-Ⅱ-2", content: "各種基本句型。" },
+            { id: "Ac-Ⅱ-3", content: "基礎複句的意義。" },
+            { id: "Ac-Ⅱ-4", content: "各類文句的語氣與意義。" },
+            
+            // 篇章
+            { id: "Ad-Ⅱ-1", content: "意義段。" },
+            { id: "Ad-Ⅱ-2", content: "篇章的大意、主旨與簡單結構。" },
+            { id: "Ad-Ⅱ-3", content: "故事、童詩、現代散文等。" },
+            
+            // 記敘文本
+            { id: "Ba-Ⅱ-1", content: "記敘文本的結構。" },
+            { id: "Ba-Ⅱ-2", content: "順敘與倒敘法。" },
+            
+            // 抒情文本
+            { id: "Bb-Ⅱ-1", content: "自我情感的表達。" },
+            { id: "Bb-Ⅱ-2", content: "人際交流的情感。" },
+            { id: "Bb-Ⅱ-3", content: "對物或自然的情懷。" },
+            { id: "Bb-Ⅱ-4", content: "直接抒情。" },
+            { id: "Bb-Ⅱ-5", content: "藉由敘述事件與描寫景物間接抒情。" },
+            { id: "Bb-Ⅱ-6", content: "抒情文本的結構。" },
+            
+            // 說明文本
+            { id: "Bc-Ⅱ-1", content: "具邏輯、客觀、理性的說明，如科學知識、產品、環境等文本。" },
+            { id: "Bc-Ⅱ-2", content: "描述、列舉、因果等寫作手法。" },
+            { id: "Bc-Ⅱ-3", content: "數據、圖表、圖片、工具列等輔助說明。" },
+            
+            // 應用文本
+            { id: "Be-Ⅱ-1", content: "在生活應用方面，以日記、海報的格式與寫作方法為主。" },
+            { id: "Be-Ⅱ-2", content: "在人際溝通方面，以書信、卡片、便條、啟事等慣用語彙及書寫格式為主。" },
+            { id: "Be-Ⅱ-3", content: "在學習應用方面，以心得報告的寫作方法為主。" },
+            { id: "Be-Ⅱ-4", content: "應用文本的結構。" },
+            
+            // 物質文化
+            { id: "Ca-Ⅱ-1", content: "各類文本中的飲食、服飾、交通工具、名勝古蹟及休閒娛樂等文化內涵。" },
+            
+            // 社群文化
+            { id: "Cb-Ⅱ-1", content: "各類文本中的親屬關係、道德倫理、儀式風俗等文化內涵。" },
+            { id: "Cb-Ⅱ-2", content: "各類文本中所反映的個人與家庭、鄉里、國族及其他社群的關係。" },
+            
+            // 精神文化
+            { id: "Cc-Ⅱ-1", content: "各類文本中的藝術、信仰、思想等文化內涵。" }
+        ];
+      
+        // 國語學習內容 - 第三學習階段（國小5-6年級）
+        var chineseContentStage3 = [
+            // 字詞
+            { id: "Ab-Ⅲ-1", content: "2,700個常用字的字形、字音和字義。" },
+            { id: "Ab-Ⅲ-2", content: "2,200個常用字的使用。" },
+            { id: "Ab-Ⅲ-3", content: "常用字部首及部件的表音及表義功能。" },
+            { id: "Ab-Ⅲ-4", content: "多音字及多義字。" },
+            { id: "Ab-Ⅲ-5", content: "4,500個常用語詞的認念。" },
+            { id: "Ab-Ⅲ-6", content: "3,700個常用語詞的使用。" },
+            { id: "Ab-Ⅲ-7", content: "數位辭典的運用。" },
+            { id: "Ab-Ⅲ-8", content: "詞類的分辨。" },
+            { id: "Ab-Ⅲ-9", content: "楷書形體結構要領。" },
+            
+            // 句段
+            { id: "Ac-Ⅲ-1", content: "標點符號在文本中的作用。" },
+            { id: "Ac-Ⅲ-2", content: "基礎句型結構。" },
+            { id: "Ac-Ⅲ-3", content: "各種複句的意義。" },
+            { id: "Ac-Ⅲ-4", content: "各類文句表達的情感與意義。" },
+            
+            // 篇章
+            { id: "Ad-Ⅲ-1", content: "意義段與篇章結構。" },
+            { id: "Ad-Ⅲ-2", content: "篇章的大意、主旨、結構與寓意。" },
+            { id: "Ad-Ⅲ-3", content: "故事、童詩、現代散文、少年小說、兒童劇等。" },
+            { id: "Ad-Ⅲ-4", content: "古典詩文。" },
+            
+            // 記敘文本
+            { id: "Ba-Ⅲ-1", content: "順敘與倒敘法。" },
+            
+            // 抒情文本
+            { id: "Bb-Ⅲ-1", content: "自我情感的表達。" },
+            { id: "Bb-Ⅲ-2", content: "人際交流的情感。" },
+            { id: "Bb-Ⅲ-3", content: "對物或自然的感悟。" },
+            { id: "Bb-Ⅲ-4", content: "直接抒情。" },
+            { id: "Bb-Ⅲ-5", content: "藉由敘述事件與描寫景物間接抒情。" },
+            
+            // 說明文本
+            { id: "Bc-Ⅲ-1", content: "具邏輯、客觀、理性的說明，如科學知識、產品、環境等。" },
+            { id: "Bc-Ⅲ-2", content: "描述、列舉、因果、問題解決、比較等寫作手法。" },
+            { id: "Bc-Ⅲ-3", content: "數據、圖表、圖片、工具列等輔助說明。" },
+            { id: "Bc-Ⅲ-4", content: "說明文本的結構。" },
+            
+            // 議論文本
+            { id: "Bd-Ⅲ-1", content: "以事實、理論為論據，達到說服、建構、批判等目的。" },
+            { id: "Bd-Ⅲ-2", content: "論證方式如舉例、正證、反證等。" },
+            { id: "Bd-Ⅲ-3", content: "議論文本的結構。" },
+            
+            // 應用文本
+            { id: "Be-Ⅲ-1", content: "在生活應用方面，以說明書、廣告、標語、告示、公約等格式與寫作方法為主。" },
+            { id: "Be-Ⅲ-2", content: "在人際溝通方面，以通知、電子郵件便條等慣用語彙及書寫格式為主。" },
+            { id: "Be-Ⅲ-3", content: "在學習應用方面，以簡報、讀書報告、演講稿等格式與寫作方法為主。" },
+            
+            // 物質文化
+            { id: "Ca-Ⅲ-1", content: "各類文本中的飲食、服飾、建築形式、交通工具、名勝古蹟及休閒娛樂等文化內涵。" },
+            { id: "Ca-Ⅲ-2", content: "各類文本中表現科技演進、環境發展的文化內涵。" },
+            
+            // 社群文化
+            { id: "Cb-Ⅲ-1", content: "各類文本中的親屬關係、道德倫理、儀式風俗、典章制度等文化內涵。" },
+            { id: "Cb-Ⅲ-2", content: "各類文本中所反映的個人與家庭、鄉里、國族及其他社群的關係。" },
+            
+            // 精神文化
+            { id: "Cc-Ⅲ-1", content: "各類文本中的藝術、信仰、思想等文化內涵。" }
+        ];
+
+        // ========================= 數學資料庫 =========================
+        // 數學重點項目
+        var mathFocusItems = [
+            { value: "numbers", text: "數與計算" },
+            { value: "measurement", text: "量與實測" },
+            { value: "geometry", text: "空間與形狀" },
+            { value: "relations", text: "關係" },
+            { value: "data", text: "資料與不確定性" },
+            { value: "shapes", text: "幾何" },
+            { value: "algebra", text: "代數" }
+        ];
+
+        // 數學優勢/弱勢項目
+        var mathStrengthWeaknessItems = [
+            { value: "numbers", text: "數與計算" },
+            { value: "measurement", text: "量與實測" },
+            { value: "geometry", text: "空間與形狀" },
+            { value: "relations", text: "關係" },
+            { value: "data", text: "資料與不確定性" },
+            { value: "shapes", text: "幾何" },
+            { value: "algebra", text: "代數" }
+        ];
+
+        // 數學核心素養
+        var mathCoreCompetencies = [
+            { id: "數-E-A1", content: "具備喜歡數學、對數學世界好奇、有積極主動的學習態度，並能將數學語言運用於日常生活中。" },
+            { id: "數-E-A2", content: "具備基本的算術操作能力、並能指認基本的形體與相對關係，在日常生活情境中，用數學表述與解決問題。" },
+            { id: "數-E-A3", content: "能觀察出日常生活問題和數學的關聯，並能嘗試與擬訂解決問題的計畫。在解決問題之後，能轉化數學解答於日常生活的應用。" },
+            { id: "數-E-B1", content: "具備日常語言與數字及算術符號之間的轉換能力，並能熟練操作日常使用之度量衡及時間，認識日常經驗中的幾何形體，並能以符號表示公式。" },
+            { id: "數-E-B2", content: "具備報讀、製作基本統計圖表之能力。" },
+            { id: "數-E-B3", content: "具備感受藝術作品中的數學形體或式樣的素養。" },
+            { id: "數-E-C1", content: "具備從證據討論事情，以及和他人有條理溝通的態度。" },
+            { id: "數-E-C2", content: "樂於與他人合作解決問題並尊重不同的問題解決想法。" },
+            { id: "數-E-C3", content: "具備理解與關心多元文化或語言的數學表徵的素養，並與自己的語言文化比較。" }
+        ];
+
+        // 數學學習表現 - 第一學習階段（國小1-2年級）
+        var mathPerformanceStage1 = [
+            // 第一學習階段（國小1-2年級）
+            { id: "n-I-1", content: "理解一千以內數的位值結構，據以做為四則運算之基礎。" },
+            { id: "n-I-2", content: "理解加法和減法的意義，熟練基本加減法並能流暢計算。" },
+            { id: "n-I-3", content: "應用加法和減法的計算或估算於日常應用解題。" },
+            { id: "n-I-4", content: "理解乘法的意義，熟練十十乘法，並初步進行分裝與平分的除法活動。" },
+            { id: "n-I-5", content: "在具體情境中，解決簡單兩步驟應用問題。" },
+            { id: "n-I-6", content: "認識單位分數。" },
+            { id: "n-I-7", content: "理解長度及其常用單位，並做實測、估測與計算。" },
+            { id: "n-I-8", content: "認識容量、重量、面積。" },
+            { id: "n-I-9", content: "認識時刻與時間常用單位。" },
+            { id: "s-I-1", content: "從操作活動，初步認識物體與常見幾何形體的幾何特徵。" },
+            { id: "r-I-1", content: "學習數學語言中的運算符號、關係符號、算式約定。" },
+            { id: "r-I-2", content: "認識加法和乘法的運算規律。" },
+            { id: "r-I-3", content: "認識加減互逆，並能應用與解題。" },
+            { id: "d-I-1", content: "認識分類的模式，能主動蒐集資料、分類，並做簡單的呈現與說明。" }
+        ];
+        
+        // 數學學習表現 - 第二學習階段（國小3-4年級）
+        var mathPerformanceStage2 = [
+            // 第二學習階段（國小3-4年級）
+            { id: "n-II-1", content: "理解一億以內數的位值結構，並據以作為各種運算與估算之基礎。" },
+            { id: "n-II-2", content: "熟練較大位數之加、減、乘計算或估算，並能應用於日常解題。" },
+            { id: "n-II-3", content: "理解除法的意義，能做計算與估算，並能應用於日常解題。" },
+            { id: "n-II-4", content: "解決四則估算之日常應用問題。" },
+            { id: "n-II-5", content: "在具體情境中，解決兩步驟應用問題。" },
+            { id: "n-II-6", content: "理解同分母分數的加、減、整數倍的意義、計算與應用。認識等值分數的意義，並應用於認識簡單異分母分數之比較與加減的意義。" },
+            { id: "n-II-7", content: "理解小數的意義與位值結構，並能做加、減、整數倍的直式計算與應用。" },
+            { id: "n-II-8", content: "能在數線標示整數、分數、小數並做比較與加減，理解整數、分數、小數都是數。" },
+            { id: "n-II-9", content: "理解長度、角度、面積、容量、重量的常用單位與換算，培養量感與估測能力，並能做計算和應用解題。認識體積。" },
+            { id: "n-II-10", content: "理解時間的加減運算，並應用於日常的時間加減問題。" },
+            { id: "s-II-1", content: "理解正方形和長方形的面積與周長公式與應用。" },
+            { id: "s-II-2", content: "認識平面圖形全等的意義。" },
+            { id: "s-II-3", content: "透過平面圖形的構成要素，認識常見三角形、常見四邊形與圓。" },
+            { id: "s-II-4", content: "在活動中，認識幾何概念的應用，如旋轉角、展開圖與空間形體。" },
+            { id: "r-II-1", content: "理解乘除互逆，並能應用與解題。" },
+            { id: "r-II-2", content: "認識一維及二維之數量模式，並能說明與簡單推理。" },
+            { id: "r-II-3", content: "理解兩步驟問題的併式計算與四則混合計算之約定。" },
+            { id: "r-II-4", content: "認識兩步驟計算中加減與部分乘除計算的規則並能應用。" },
+            { id: "r-II-5", content: "理解以文字表示之數學公式。" },
+            // 數學學習表現 - 第二學習階段（續）
+            { id: "d-II-1", content: "報讀與製作一維表格、二維表格與長條圖，報讀折線圖，並據以做簡單推論。" }
+        ];
+        
+        // 數學學習表現 - 第三學習階段（國小5-6年級）
+        var mathPerformanceStage3 = [
+            // 第三學習階段（國小5-6年級）
+            { id: "n-III-1", content: "理解數的十進位的位值結構，並能據以延伸認識更大與更小的數。" },
+            { id: "n-III-2", content: "在具體情境中，解決三步驟以上之常見應用問題。" },
+            { id: "n-III-3", content: "認識因數、倍數、質數、最大公因數、最小公倍數的意義、計算與應用。" },
+            { id: "n-III-4", content: "理解約分、擴分、通分的意義，並應用於異分母分數的加減。" },
+            { id: "n-III-5", content: "理解整數相除的分數表示的意義。" },
+            { id: "n-III-6", content: "理解分數乘法和除法的意義、計算與應用。" },
+            { id: "n-III-7", content: "理解小數乘法和除法的意義，能做直式計算與應用。" },
+            { id: "n-III-8", content: "理解以四捨五入取概數，並進行合理估算。" },
+            { id: "n-III-9", content: "理解比例關係的意義，並能據以觀察、表述、計算與解題，如比率、比例尺、速度、基準量等。" },
+            { id: "n-III-10", content: "嘗試將較複雜的情境或模式中的數量關係以算式正確表述，並據以推理或解題。" },
+            { id: "n-III-11", content: "認識量的常用單位及其換算，並處理相關的應用問題。" },
+            { id: "n-III-12", content: "理解容量、容積和體積之間的關係，並做應用。" },
+            { id: "s-III-1", content: "理解三角形、平行四邊形與梯形的面積計算。" },
+            { id: "s-III-2", content: "認識圓周率的意義，理解圓面積、圓周長、扇形面積與弧長之計算方式。" },
+            { id: "s-III-3", content: "從操作活動，理解空間中面與面的關係與簡單立體形體的性質。" },
+            { id: "s-III-4", content: "理解角柱（含正方體、長方體）與圓柱的體積與表面積的計算方式。" },
+            { id: "s-III-5", content: "以簡單推理，理解幾何形體的性質。" },
+            { id: "s-III-6", content: "認識線對稱的意義與其推論。" },
+            { id: "s-III-7", content: "認識平面圖形縮放的意義與應用。" },
+            { id: "r-III-1", content: "理解各種計算規則（含分配律），並協助四則混合計算與應用解題。" },
+            { id: "r-III-2", content: "熟練數（含分數、小數）的四則混合計算。" },
+            { id: "r-III-3", content: "觀察情境或模式中的數量關係，並用文字或符號正確表述，協助推理與解題。" },
+            { id: "d-III-1", content: "報讀圓形圖，製作折線圖與圓形圖，並據以做簡單推論。" },
+            { id: "d-III-2", content: "能從資料或圖表的資料數據，解決關於「可能性」的簡單問題。" }
+        ];
+
+        // 數學學習內容 - 第一學習階段（國小1-2年級）
+        var mathContentStage1 = [
+            // 第一學習階段（國小1-2年級）
+            // N-1-x系列
+            { id: "N-1-1", content: "一百以內的數（對應n-I-1）" },
+            { id: "N-1-2", content: "加法和減法（對應n-I-2）" },
+            { id: "N-1-3", content: "基本加減法（對應n-I-2）" },
+            { id: "N-1-4", content: "解題：1元、5元、10元、50元、100元（對應n-I-3）" },
+            { id: "N-1-5", content: "長度（同S-1-1）（對應n-I-7）" },
+            { id: "N-1-6", content: "日常時間用語（對應n-I-9）" },
+            
+            // N-2-x系列
+            { id: "N-2-1", content: "一千以內的數（對應n-I-1）" },
+            { id: "N-2-2", content: "加減算式與直式計算（對應n-I-2）" },
+            { id: "N-2-3", content: "解題：加減應用問題（對應n-I-3）" },
+            { id: "N-2-4", content: "解題：簡單加減估算（對應n-I-3）" },
+            { id: "N-2-5", content: "解題：100元、500元、1000元（對應n-I-3）" },
+            { id: "N-2-6", content: "乘法（對應n-I-4）" },
+            { id: "N-2-7", content: "十十乘法（對應n-I-4）" },
+            { id: "N-2-8", content: "解題：兩步驟應用問題（加、減、乘）（對應n-I-5）" },
+            { id: "N-2-9", content: "解題：分裝與平分（對應n-I-4）" },
+            { id: "N-2-10", content: "單位分數的認識（對應n-I-6）" },
+            { id: "N-2-11", content: "長度：「公分」、「公尺」（對應n-I-7）" },
+            { id: "N-2-12", content: "容量、重量、面積（對應n-I-8）" },
+            { id: "N-2-13", content: "鐘面的時刻（對應n-I-9）" },
+            { id: "N-2-14", content: "時間：「年」、「月」、「星期」、「日」（對應n-I-9）" },
+            
+            // S-x-x系列
+            { id: "S-1-1", content: "長度（同N-1-5）（對應n-I-7）" },
+            { id: "S-1-2", content: "形體的操作（對應s-I-1）" },
+            { id: "S-2-1", content: "物體之幾何特徵（對應s-I-1）" },
+            { id: "S-2-2", content: "簡單幾何形體（對應s-I-1）" },
+            { id: "S-2-3", content: "直尺操作（對應n-I-7）" },
+            { id: "S-2-4", content: "平面圖形的邊長（對應n-I-7）" },
+            { id: "S-2-5", content: "面積（對應n-I-8）" },
+            
+            // R-x-x系列
+            { id: "R-1-1", content: "算式與符號（對應r-I-1）" },
+            { id: "R-1-2", content: "兩數相加的順序不影響其和（對應r-I-2）" },
+            { id: "R-2-1", content: "大小關係與遞移律（對應r-I-1）" },
+            { id: "R-2-2", content: "三數相加，順序改變不影響其和（對應r-I-2）" },
+            { id: "R-2-3", content: "兩數相乘的順序不影響其積（對應r-I-2）" },
+            { id: "R-2-4", content: "加法與減法的關係（對應n-I-3, r-I-3）" },
+            
+            // D-x-x系列
+            { id: "D-1-1", content: "簡單分類（對應d-I-1）" },
+            { id: "D-2-1", content: "分類與呈現（對應d-I-1）" }
+        ];
+        
+        // 數學學習內容 - 第二學習階段（國小3-4年級）
+        var mathContentStage2 = [
+            // 第二學習階段（國小3-4年級）
+            // N-3-x系列
+            { id: "N-3-1", content: "一萬以內的數（對應n-II-1）" },
+            { id: "N-3-2", content: "加減直式計算（對應n-II-2）" },
+            { id: "N-3-3", content: "乘以一位數（對應n-II-2）" },
+            { id: "N-3-4", content: "除法（對應n-II-3）" },
+            { id: "N-3-5", content: "除以一位數（對應n-II-3）" },
+            { id: "N-3-6", content: "解題：乘除應用問題（對應n-II-2, n-II-3）" },
+            { id: "N-3-7", content: "解題：兩步驟應用問題（加減與除、連乘）（對應n-II-5）" },
+            { id: "N-3-8", content: "解題：四則估算（對應n-II-4）" },
+            { id: "N-3-9", content: "簡單同分母分數（對應n-II-6）" },
+            { id: "N-3-10", content: "一位小數（對應n-II-7）" },
+            { id: "N-3-11", content: "整數數線（對應n-II-8）" },
+            { id: "N-3-12", content: "長度：「毫米」（對應n-II-9）" },
+            { id: "N-3-13", content: "角與角度（同S-3-1）（對應n-II-9）" },
+            { id: "N-3-14", content: "面積：「平方公分」（對應n-II-9）" },
+            { id: "N-3-15", content: "容量：「公升」、「毫升」（對應n-II-9）" },
+            { id: "N-3-16", content: "重量：「公斤」、「公克」（對應n-II-9）" },
+            { id: "N-3-17", content: "時間：「日」、「時」、「分」、「秒」（對應n-II-10）" },
+            
+            // N-4-x系列
+            { id: "N-4-1", content: "一億以內的數（對應n-II-1）" },
+            { id: "N-4-2", content: "較大位數之乘除計算（對應n-II-2, n-II-3）" },
+            { id: "N-4-3", content: "解題：兩步驟應用問題（乘除，連除）（對應n-II-5）" },
+            { id: "N-4-4", content: "解題：對大數取概數（對應n-II-4）" },
+            { id: "N-4-5", content: "同分母分數（對應n-II-6）" },
+            { id: "N-4-6", content: "等值分數（對應n-II-6）" },
+            { id: "N-4-7", content: "二位小數（對應n-II-7）" },
+            { id: "N-4-8", content: "數線與分數、小數（對應n-II-8）" },
+            { id: "N-4-9", content: "長度：「公里」（對應n-II-9）" },
+            { id: "N-4-10", content: "角度：「度」（同S-4-1）（對應n-II-9）" },
+            { id: "N-4-11", content: "面積：「平方公尺」（對應n-II-9）" },
+            { id: "N-4-12", content: "體積與「立方公分」（對應n-II-9）" },
+            { id: "N-4-13", content: "解題：日常生活的時間加減問題（對應n-II-10）" },
+            
+            // S-x-x系列
+            { id: "S-3-1", content: "角與角度（同N-3-13）（對應n-II-9）" },
+            { id: "S-3-2", content: "正方形和長方形（對應s-II-1）" },
+            { id: "S-3-3", content: "圓（對應s-II-3）" },
+            { id: "S-3-4", content: "幾何形體之操作（對應s-II-4）" },
+            { id: "S-4-1", content: "角度：「度」（同N-4-10）（對應n-II-9）" },
+            { id: "S-4-2", content: "解題：旋轉角（對應s-II-4）" },
+            { id: "S-4-3", content: "正方形與長方形的面積與周長（對應s-II-1）" },
+            { id: "S-4-4", content: "體積（對應n-II-9）" },
+            { id: "S-4-5", content: "垂直與平行（對應s-II-3）" },
+            { id: "S-4-6", content: "平面圖形的全等（對應s-II-2）" },
+            { id: "S-4-7", content: "三角形（對應s-II-3）" },
+            { id: "S-4-8", content: "四邊形（對應s-II-3）" },
+            
+            // R-x-x系列
+            { id: "R-3-1", content: "乘法與除法的關係（對應r-II-1）" },
+            { id: "R-3-2", content: "數量模式與推理（I）（對應r-II-2）" },
+            { id: "R-4-1", content: "兩步驟問題併式（對應r-II-3）" },
+            { id: "R-4-2", content: "四則計算規律（I）（對應r-II-4）" },
+            { id: "R-4-3", content: "以文字表示數學公式（對應r-II-5）" },
+            { id: "R-4-4", content: "數量模式與推理（II）（對應r-II-2）" },
+            
+            // D-x-x系列
+            { id: "D-3-1", content: "一維表格與二維表格（對應d-II-1）" },
+            { id: "D-4-1", content: "報讀長條圖與折線圖以及製作長條圖（對應d-II-1）" }
+        ];
+      
+        // 數學學習內容 - 第三學習階段（國小5-6年級）
+        var mathContentStage3 = [
+            // 第三學習階段（國小5-6年級）
+            // N-5-x系列
+            { id: "N-5-1", content: "十進位的位值系統（對應n-III-1）" },
+            { id: "N-5-2", content: "解題：多步驟應用問題（對應n-III-2）" },
+            { id: "N-5-3", content: "公因數和公倍數（對應n-III-3）" },
+            { id: "N-5-4", content: "異分母分數（對應n-III-4）" },
+            { id: "N-5-5", content: "分數的乘法（對應n-III-6）" },
+            { id: "N-5-6", content: "整數相除之分數表示（對應n-III-5）" },
+            { id: "N-5-7", content: "分數除以整數（對應n-III-6）" },
+            { id: "N-5-8", content: "小數的乘法（對應n-III-7）" },
+            { id: "N-5-9", content: "整數、小數除以整數（商為小數）（對應n-III-7）" },
+            { id: "N-5-10", content: "解題：比率與應用（對應n-III-5, n-III-9）" },
+            { id: "N-5-11", content: "解題：對小數取概數（對應n-III-8）" },
+            { id: "N-5-12", content: "面積：「公畝」、「公頃」、「平方公里」（對應n-III-11）" },
+            { id: "N-5-13", content: "重量：「公噸」（對應n-III-11）" },
+            { id: "N-5-14", content: "體積：「立方公尺」（對應n-III-11）" },
+            { id: "N-5-15", content: "解題：容積（對應n-III-12）" },
+            { id: "N-5-16", content: "解題：時間的乘除問題（對應n-III-11）" },
+            
+            // N-6-x系列
+            { id: "N-6-1", content: "20以內的質數和質因數分解（對應n-III-3）" },
+            { id: "N-6-2", content: "最大公因數與最小公倍數（對應n-III-3）" },
+            { id: "N-6-3", content: "分數的除法（對應n-III-6）" },
+            { id: "N-6-4", content: "小數的除法（對應n-III-7）" },
+            { id: "N-6-5", content: "解題：整數、分數、小數的四則應用問題（對應n-III-2, r-III-2）" },
+            { id: "N-6-6", content: "比與比值（對應n-III-9）" },
+            { id: "N-6-7", content: "解題：速度（對應n-III-9）" },
+            { id: "N-6-8", content: "解題：基準量與比較量（對應n-III-9）" },
+            { id: "N-6-9", content: "解題：由問題中的數量關係，列出恰當的算式解題（對應n-III-10, r-III-3）" },
+            
+            // S-x-x系列
+            { id: "S-5-1", content: "三角形與四邊形的性質（對應s-III-5）" },
+            { id: "S-5-2", content: "三角形與四邊形的面積（對應s-III-1）" },
+            { id: "S-5-3", content: "扇形（對應s-III-2）" },
+            { id: "S-5-4", content: "線對稱（對應s-III-6）" },
+            { id: "S-5-5", content: "正方體和長方體（對應s-III-4）" },
+            { id: "S-5-6", content: "空間中面與面的關係（對應s-III-3）" },
+            { id: "S-5-7", content: "球、柱體與錐體（對應s-III-3）" },
+            { id: "S-6-1", content: "放大與縮小（對應s-III-7）" },
+            { id: "S-6-2", content: "解題：地圖比例尺（對應n-III-9, s-III-7）" },
+            { id: "S-6-3", content: "圓周率、圓周長、圓面積、扇形面積（對應s-III-2）" },
+            { id: "S-6-4", content: "柱體體積與表面積（對應s-III-4）" },
+            
+            // R-x-x系列
+            { id: "R-5-1", content: "三步驟問題併式（對應r-III-1）" },
+            { id: "R-5-2", content: "四則計算規律（II）（對應r-III-1）" },
+            { id: "R-5-3", content: "以符號表示數學公式（對應r-III-3）" },
+            { id: "R-6-1", content: "數的計算規律（對應r-III-2）" },
+            { id: "R-6-2", content: "數量關係（對應r-III-3）" },
+            { id: "R-6-3", content: "數量關係的表示（對應r-III-3）" },
+            { id: "R-6-4", content: "解題：由問題中的數量關係，列出恰當的算式解題（對應r-III-3, n-III-10）" },
+            
+            // D-x-x系列
+            { id: "D-5-1", content: "製作折線圖（對應d-III-1）" },
+            { id: "D-6-1", content: "圓形圖（對應d-III-1）" },
+            { id: "D-6-2", content: "解題：可能性（對應d-III-2）" }
+        ];
+
+        // ========================= 英語文資料庫 =========================
+        // 英語重點項目
+        var englishFocusItems = [
+            { value: "listening", text: "語音聽辨" },
+            { value: "vocabulary", text: "詞彙聽辨" },
+            { value: "culture", text: "文化節慶理解" },
+            { value: "words", text: "字詞辨識" },
+            { value: "sentences", text: "句子理解" },
+            { value: "classroom", text: "教室生活詞句理解與回應" },
+            { value: "reading", text: "短文與對話理解" },
+            { value: "charts", text: "短篇圖表理解(六年級)" }
+        ];
+
+        // 英語優勢/弱勢項目
+        var englishStrengthWeaknessItems = [
+            { value: "listening", text: "語音聽辨" },
+           { value: "vocabulary", text: "詞彙聽辨" },
+            { value: "culture", text: "文化節慶理解" },
+            { value: "words", text: "字詞辨識" },
+            { value: "sentences", text: "句子理解" },
+            { value: "classroom", text: "教室生活詞句理解與回應" },
+            { value: "reading", text: "短文與對話理解" },
+            { value: "charts", text: "短篇圖表理解(六年級)" }
+        ];
+
+        // 英語核心素養
+        var englishCoreCompetencies = [
+            { id: "英-E-A1", content: "具備認真專注的特質及良好的學習習慣，嘗試運用基本的學習策略，強化個人英語文能力。" },
+            { id: "英-E-A2", content: "具備理解簡易英語文訊息的能力，能運用基本邏輯思考策略提升學習效能。" },
+            { id: "英-E-B1", content: "具備入門的聽、說、讀、寫英語文能力。在引導下，能運用所學、字詞及句型進行簡易日常溝通。" },
+            { id: "英-E-B2", content: "具備使用各種資訊科技媒材進行自我學習的能力，以增進英語文聽說讀寫綜合應用能力及文化習俗之理解。" },
+            { id: "英-E-C2", content: "積極參與課內英語文小組學習活動，培養團隊合作精神。" },
+            { id: "英-E-C3", content: "認識國內外主要節慶習俗及風土民情。" }
+        ];
+
+        // 英語學習表現 - 第二學習階段（國小3-4年級）
+        var englishPerformanceStage2 = [
+            // 語言能力（聽）
+            { id: "1-Ⅱ-1", content: "能聽辨26個字母。" },
+            { id: "1-Ⅱ-2", content: "能聽辨英語的子音、母音及其基本的組合。" },
+            { id: "1-Ⅱ-3", content: "能聽辨字詞是單音節或多音節，並辨識重音的音節。" },
+            { id: "1-Ⅱ-4", content: "能聽辨句子的語調。" },
+            { id: "1-Ⅱ-5", content: "能聽辨課堂中所學的片語、句子及其重音。" },
+            { id: "1-Ⅱ-6", content: "能聽辨句子的節奏。" },
+            { id: "1-Ⅱ-7", content: "能聽懂課堂中所學的字詞。" },
+            { id: "1-Ⅱ-8", content: "能聽懂簡易的教室用語。" },
+            { id: "1-Ⅱ-9", content: "能聽懂簡易的日常生活用語。" },
+            { id: "1-Ⅱ-10", content: "能聽懂簡易句型的句子。" },
+            
+            // 語言能力（說）
+            { id: "2-Ⅱ-1", content: "能說出26個字母。" },
+            { id: "2-Ⅱ-2", content: "能唸出英語的語音。" },
+            { id: "2-Ⅱ-3", content: "能說出課堂中所學的字詞。" },
+            { id: "2-Ⅱ-4", content: "能使用簡易的教室用語。" },
+            { id: "2-Ⅱ-5", content: "能使用簡易的日常生活用語。" },
+            { id: "2-Ⅱ-6", content: "能以正確的發音及適切的語調說出簡易句型的句子。" },
+            
+            // 語言能力（讀）
+            { id: "3-Ⅱ-1", content: "能辨識26個印刷體大小寫字母。" },
+            { id: "3-Ⅱ-2", content: "能辨識課堂中所學的字詞。" },
+            { id: "3-Ⅱ-3", content: "能看懂課堂中所學的句子。" },
+            
+            // 語言能力（寫）
+            { id: "4-Ⅱ-1", content: "能書寫26個印刷體大小寫字母。" },
+            { id: "4-Ⅱ-2", content: "能書寫自己的姓名。" },
+            { id: "4-Ⅱ-3", content: "能臨摹抄寫課堂中所學的字詞。" },
+            { id: "4-Ⅱ-4", content: "能臨摹抄寫課堂中所學的句子。" },
+            
+            // 語言能力（聽說讀寫綜合應用能力）
+            { id: "5-Ⅱ-1", content: "能正確地認讀與聽寫26個字母。" },
+            { id: "5-Ⅱ-2", content: "在聽讀時，能辨識書本中相對應的書寫文字。" },
+            { id: "5-Ⅱ-3", content: "能以正確的發音及適切的速度朗讀簡易句型的句子。" },
+            { id: "5-Ⅱ-4", content: "能運用所學的字母拼讀規則讀出英文字詞。" },
+            // 學習興趣與態度
+            { id: "6-Ⅱ-1", content: "能專注於教師的說明與演示。" },
+            { id: "6-Ⅱ-2", content: "積極參與各種課堂練習活動。" },
+            { id: "6-Ⅱ-3", content: "樂於回答教師或同學所提的問題。" },
+            { id: "6-Ⅱ-4", content: "認真完成教師交待的作業。" },
+            
+            // 學習方法與策略
+            { id: "7-Ⅱ-1", content: "善用預習、複習強化學習效果。" },
+            { id: "7-Ⅱ-2", content: "能妥善運用情境中的非語言訊息以幫助學習。" },
+            
+            // 文化理解
+            { id: "8-Ⅱ-1", content: "能了解國內外基本的招呼方式。" },
+            { id: "8-Ⅱ-2", content: "能了解課堂中所介紹的國內主要節慶習俗。" },
+            { id: "8-Ⅱ-3", content: "能了解課堂中所介紹的國外主要節慶習俗。" },
+            
+            // 邏輯思考、判斷與創造力
+            { id: "9-Ⅱ-1", content: "能夠將所學字詞做簡易歸類。" }
+        ];
+
+        // 英語學習表現 - 第三學習階段（國小5-6年級）
+        var englishPerformanceStage3 = [
+            // 語言能力（聽）
+            { id: "1-Ⅲ-1", content: "能聽辨英語的子音、母音及其不同的組合。" },
+            { id: "1-Ⅲ-2", content: "能聽辨字詞是單音節或多音節，並辨識重音的音節。" },
+            { id: "1-Ⅲ-3", content: "能聽辨句子的語調。" },
+            { id: "1-Ⅲ-4", content: "能聽辨課堂中所學的片語、句子及其重音。" },
+            { id: "1-Ⅲ-5", content: "能聽辨句子的節奏。" },
+            { id: "1-Ⅲ-6", content: "能聽懂課堂中所學的字詞。" },
+            { id: "1-Ⅲ-7", content: "能聽懂簡易的教室用語。" },
+            { id: "1-Ⅲ-8", content: "能聽懂簡易的日常生活用語。" },
+            { id: "1-Ⅲ-9", content: "能聽懂簡易句型的句子。" },
+            { id: "1-Ⅲ-10", content: "能聽懂簡易的日常生活對話。" },
+            { id: "1-Ⅲ-11", content: "能聽懂簡易歌謠和韻文的主要內容。" },
+            { id: "1-Ⅲ-12", content: "能聽懂簡易故事及短劇的主要內容。" },
+            { id: "1-Ⅲ-13", content: "能辨識簡易句子語調所表達的情緒和態度。" },
+            { id: "1-Ⅲ-14", content: "能了解簡易歌謠、韻文的節奏與音韻。" },
+            
+            // 語言能力（說）
+            { id: "2-Ⅲ-1", content: "能唸出英語的語音。" },
+            { id: "2-Ⅲ-2", content: "能說出課堂中所學的字詞。" },
+            { id: "2-Ⅲ-3", content: "能以簡易的英語介紹自己。" },
+            { id: "2-Ⅲ-4", content: "能以簡易的英語介紹家人和朋友。" },
+            { id: "2-Ⅲ-5", content: "能使用簡易的教室用語。" },
+            { id: "2-Ⅲ-6", content: "能使用簡易的日常生活用語。" },
+            { id: "2-Ⅲ-7", content: "能作簡易的回答和描述。" },
+            { id: "2-Ⅲ-8", content: "能作簡易的提問。" },
+            { id: "2-Ⅲ-9", content: "能以正確的發音及適切的語調說出簡易句型的句子。" },
+            { id: "2-Ⅲ-10", content: "能複誦和吟唱簡易的歌謠韻文。" },
+            { id: "2-Ⅲ-11", content: "能進行簡易的角色扮演。" },
+            
+            // 語言能力（讀）
+            { id: "3-Ⅲ-1", content: "能辨識課堂中所學的字詞。" },
+            { id: "3-Ⅲ-2", content: "能看懂校園內簡易的英文標示。" },
+            { id: "3-Ⅲ-3", content: "能看懂教室用語。" },
+            { id: "3-Ⅲ-4", content: "能看懂課堂中所學的句子。" },
+            { id: "3-Ⅲ-5", content: "能看懂課堂中所學的簡易對話。" },
+            { id: "3-Ⅲ-6", content: "能看懂課堂中所學的簡易短文之主要內容。" },
+            { id: "3-Ⅲ-7", content: "能看懂繪本故事的主要內容。" },
+            { id: "3-Ⅲ-8", content: "能看懂兒童短劇中的主要內容。" },
+            { id: "3-Ⅲ-9", content: "能藉圖畫、標題、書名等作簡易的猜測。" },
+            
+            // 語言能力（寫）
+            { id: "4-Ⅲ-1", content: "能抄寫課堂中所學的字詞。" },
+            { id: "4-Ⅲ-2", content: "能抄寫課堂中所學的句子。" },
+            { id: "4-Ⅲ-3", content: "能拼寫國小階段基本常用字詞。" },
+            { id: "4-Ⅲ-4", content: "能依圖畫、圖示填寫簡單字詞。" },
+            { id: "4-Ⅲ-5", content: "能正確使用大小寫及簡易的標點符號。" },
+            { id: "4-Ⅲ-6", content: "能書寫課堂中所學的句子。" },
+            
+            // 語言能力（聽說讀寫綜合應用能力）
+            { id: "5-Ⅲ-1", content: "認讀與聽寫國小階段字詞。" },
+            { id: "5-Ⅲ-2", content: "在聽讀時，能辨識書本中相對應的書寫文字。" },
+            { id: "5-Ⅲ-3", content: "能聽懂、讀懂國小階段基本字詞及句型，並使用於簡易日常溝通。" },
+            { id: "5-Ⅲ-4", content: "能聽懂日常生活應對中常用語句，並能作適當的回應。" },
+            { id: "5-Ⅲ-5", content: "能以正確的發音及適切的速度朗讀簡易句型的句子。" },
+            { id: "5-Ⅲ-6", content: "能以正確的發音及適切的速度朗讀或吟唱簡易歌謠韻文。" },
+            { id: "5-Ⅲ-7", content: "能以正確的發音及適切的速度朗讀簡易對話。" },
+            { id: "5-Ⅲ-8", content: "能以正確的發音及適切的速度朗讀簡易故事及短劇。" },
+            { id: "5-Ⅲ-9", content: "能運用所學的字母拼讀規則讀出英文字詞。" },
+            { id: "5-Ⅲ-10", content: "能運用所學的字母拼讀規則拼寫英文字詞。" },
+            
+            // 學習興趣與態度
+            { id: "6-Ⅲ-1", content: "具有好奇心，主動向教師或同學提出問題。" },
+            { id: "6-Ⅲ-2", content: "樂於參與課堂中各類練習活動，不畏犯錯。" },
+            { id: "6-Ⅲ-3", content: "主動預習、溫習功課。" },
+            { id: "6-Ⅲ-4", content: "會在生活中或媒體上注意到學過的英語。" },
+            { id: "6-Ⅲ-5", content: "樂於接觸課外英語學習素材。" },
+            { id: "6-Ⅲ-6", content: "在生活中接觸英語時，樂於探究其意涵並嘗試使用。" },
+            { id: "6-Ⅲ-7", content: "樂於參與有助提升英語能力的活動（如英語營、歌唱、朗讀、說故事、讀者劇場等活動）。" },
+            
+            // 學習方法與策略
+            { id: "7-Ⅲ-1", content: "運用已學過字詞之聯想以學習新的字詞。" },
+            { id: "7-Ⅲ-2", content: "能用字典查閱字詞的發音及意義。" },
+            { id: "7-Ⅲ-3", content: "在生活中能把握機會，勇於嘗試使用英語。" },
+            { id: "7-Ⅲ-4", content: "對教師或同學討論的內容能舉出示例或反例。" },
+            
+            // 文化理解
+            { id: "8-Ⅲ-1", content: "能了解國內外基本的招呼方式。" },
+            { id: "8-Ⅲ-2", content: "能了解課堂中所介紹的國內主要節慶習俗。" },
+            { id: "8-Ⅲ-3", content: "能了解課堂中所介紹的國外主要節慶習俗。" },
+            { id: "8-Ⅲ-4", content: "能了解外國風土民情。" },
+            
+            // 邏輯思考、判斷與創造力
+            { id: "9-Ⅲ-1", content: "能夠將所學字詞做簡易歸類。" },
+            { id: "9-Ⅲ-2", content: "能將事件依故事的發展加以排序。" },
+            { id: "9-Ⅲ-3", content: "能綜合相關資訊作簡易的猜測。" }
+        ];
+
+        // 英語學習內容 - 第二學習階段（國小3-4年級）
+        var englishContentStage2 = [
+            // 字母
+            { id: "Aa-Ⅱ-1", content: "字母名稱。" },
+            { id: "Aa-Ⅱ-2", content: "印刷體大小寫字母的辨識及書寫。" },
+            
+            // 語音
+            { id: "Ab-Ⅱ-1", content: "子音、母音及其組合。" },
+            { id: "Ab-Ⅱ-2", content: "單音節、多音節，及重音音節。" },
+            { id: "Ab-Ⅱ-3", content: "片語及句子的重音。" },
+            { id: "Ab-Ⅱ-4", content: "所學的字母拼讀規則（含看字讀音、聽音拼字）。" },
+            
+            // 字詞
+            { id: "Ac-Ⅱ-1", content: "簡易的教室用語。" },
+            { id: "Ac-Ⅱ-2", content: "簡易的生活用語。" },
+            { id: "Ac-Ⅱ-3", content: "第二學習階段所學字詞。" },
+            
+            // 溝通功能
+            { id: "B-Ⅱ-1", content: "第二學習階段所學字詞及句型的生活溝通。" },
+            
+            // 文化與習俗
+            { id: "C-Ⅱ-1", content: "國內（外）招呼方式。" },
+            { id: "C-Ⅱ-2", content: "國內外主要節慶習俗。" },
+            
+            // 思考能力
+            { id: "D-Ⅱ-1", content: "所學字詞的簡易歸類。" }
+        ];
+
+        // 英語學習內容 - 第三學習階段（國小5-6年級）
+        var englishContentStage3 = [
+            // 語音
+            { id: "Ab-Ⅲ-1", content: "子音、母音及其組合。" },
+            { id: "Ab-Ⅲ-2", content: "單音節、多音節，及重音音節。" },
+            { id: "Ab-Ⅲ-3", content: "片語及句子的重音。" },
+            { id: "Ab-Ⅲ-4", content: "句子的語調及節奏。" },
+            { id: "Ab-Ⅲ-5", content: "所學的字母拼讀規則（含看字讀音、聽音拼字）。" },
+            
+            // 字詞
+            { id: "Ac-Ⅲ-1", content: "校園內簡易的英文標示。" },
+            { id: "Ac-Ⅲ-2", content: "簡易的教室用語。" },
+            { id: "Ac-Ⅲ-3", content: "簡易的生活用語。" },
+            { id: "Ac-Ⅲ-4", content: "國小階段所學字詞（能聽、讀、說300字詞，其中必須拼寫180字詞）。" },
+            
+            // 句構
+            { id: "Ad-Ⅲ-1", content: "簡易標點符號。" },
+            { id: "Ad-Ⅲ-2", content: "簡易、常用的句型結構。" },
+            
+            // 篇章
+            { id: "Ae-Ⅲ-1", content: "簡易歌謠、韻文、短文、故事及短劇。" },
+            { id: "Ae-Ⅲ-2", content: "繪本故事、兒童短劇。" },
+            
+            // 溝通功能
+            { id: "B-Ⅲ-1", content: "自己、家人及朋友的簡易介紹。" },
+            { id: "B-Ⅲ-2", content: "國小階段所學字詞及句型的生活溝通。" },
+            
+            // 文化與習俗
+            { id: "C-Ⅲ-1", content: "國內（外）招呼方式。" },
+            { id: "C-Ⅲ-2", content: "國內外主要節慶習俗。" },
+            
+            // 思考能力
+            { id: "D-Ⅲ-1", content: "所學字詞的簡易歸類。" },
+            { id: "D-Ⅲ-2", content: "故事發展的排序。" },
+            { id: "D-Ⅲ-3", content: "依綜合資訊作簡易猜測。" }
+        ];
+
+        // ========================= 事件處理 =========================
+        // 說明按鈕事件處理
+        $("#help-btn").click(function() {
+            $("#help-modal").show();
+            $("#overlay").show();
+        });
+        
+        // 關閉說明按鈕點擊事件
+        $("#close-help-btn, #overlay").click(function() {
+            $("#help-modal").hide();
+            $("#overlay").hide();
+        });
+        
+        // 科目選擇事件
+        $("#subject").change(function() {
+            var subject = $(this).val();
+            
+            // 清空各下拉選單
+            $("#focus-area").empty().append('<option value="">請選擇重點項目</option>');
+            $("#grade").empty().append('<option value="">請選擇年級</option>');
+            $("#strength-container").empty();
+            $("#weakness-container").empty();
+            
+            // 根據選擇的科目填充相應選項
+            if (subject === "chinese") {
+                // 填充國語重點項目
+                fillSelectOptions("#focus-area", chineseFocusItems);
+                
+                // 填充年級選項 1-6
+                fillGradeOptions(1, 6);
+                
+                // 填充國語優勢/弱勢選項
+                fillCheckboxItems(chineseStrengthWeaknessItems, "strength");
+                fillCheckboxItems(chineseStrengthWeaknessItems, "weakness");
+                
+                // 更新頁面標題
+                $("h1").text("108課綱國小階段國語領域評鑑設計系統");
+                $(".footer p").text("108課綱國小階段國語領域評鑑設計系統");
+                
+            } else if (subject === "math") {
+                // 填充數學重點項目
+                fillSelectOptions("#focus-area", mathFocusItems);
+                
+                // 填充年級選項 1-6
+                fillGradeOptions(1, 6);
+                
+                // 填充數學優勢/弱勢選項
+                fillCheckboxItems(mathStrengthWeaknessItems, "strength");
+                fillCheckboxItems(mathStrengthWeaknessItems, "weakness");
+                
+                // 更新頁面標題
+                $("h1").text("108課綱國小階段數學領域評鑑設計系統");
+                $(".footer p").text("108課綱國小階段數學領域評鑑設計系統");
+                
+            } else if (subject === "english") {
+                // 填充英語重點項目
+                fillSelectOptions("#focus-area", englishFocusItems);
+                
+                // 填充年級選項 3-6
+                fillGradeOptions(3, 6);
+                
+                // 填充英語優勢/弱勢選項
+                fillCheckboxItems(englishStrengthWeaknessItems, "strength");
+                fillCheckboxItems(englishStrengthWeaknessItems, "weakness");
+                
+                // 更新頁面標題
+                $("h1").text("108課綱國小階段英語文領域評鑑設計系統");
+                $(".footer p").text("108課綱國小階段英語文領域評鑑設計系統");
+            }
+            
+            // 清空已載入的資料
+            clearLoadedData();
+        }); 
+      // 優勢/弱勢項目的互斥處理
+        $(document).on('change', "input[name='strength'], input[name='weakness']", function() {
+            var currentId = $(this).attr('id');
+            var currentValue = $(this).val();
+            
+            // 如果是優勢被選中
+            if (currentId.startsWith('strength') && $(this).prop('checked')) {
+                // 取消相應的弱勢選項
+                $('#weakness-' + currentValue).prop('checked', false);
+            }
+            
+            // 如果是弱勢被選中
+            if (currentId.startsWith('weakness') && $(this).prop('checked')) {
+                // 取消相應的優勢選項
+                $('#strength-' + currentValue).prop('checked', false);
+            }
+        });
+
+        // 載入按鈕事件處理
+        $("#loadBtn").click(function() {
+            var subject = $("#subject").val();
+            var grade = $("#grade").val();
+            
+            if (!subject) {
+                alert("請先選擇科目");
+                return;
+            }
+            
+            if (!grade) {
+                alert("請先選擇年級");
+                return;
+            }
+            
+            // 清空之前載入的資料
+            clearLoadedData();
+            
+            var competencyData, performanceData, contentData;
+          // 根據科目和年級決定要載入的資料
+            if (subject === "chinese") {
+                competencyData = chineseCoreCompetencies;
+                
+                if (grade == '1' || grade == '2') {
+                    performanceData = chinesePerformanceStage1;
+                    contentData = chineseContentStage1;
+                } else if (grade == '3' || grade == '4') {
+                    performanceData = chinesePerformanceStage2;
+                    contentData = chineseContentStage2;
+                } else {
+                    performanceData = chinesePerformanceStage3;
+                    contentData = chineseContentStage3;
+                }
+              } else if (subject === "math") {
+                competencyData = mathCoreCompetencies;
+                
+                if (grade == '1' || grade == '2') {
+                    performanceData = mathPerformanceStage1;
+                    contentData = mathContentStage1;
+                } else if (grade == '3' || grade == '4') {
+                   performanceData = mathPerformanceStage2;
+                    contentData = mathContentStage2;
+                } else {
+                    performanceData = mathPerformanceStage3;
+                    contentData = mathContentStage3;
+                }
+            } else if (subject === "english") {
+                competencyData = englishCoreCompetencies;
+                
+                if (grade == '3' || grade == '4') {
+                    performanceData = englishPerformanceStage2;
+                    contentData = englishContentStage2;
+                } else {
+                    performanceData = englishPerformanceStage3;
+                    contentData = englishContentStage3;
+                }
+            }
+            
+            // 填充三個下拉選單的資料
+            fillCompetencyOptions(competencyData);
+            fillPerformanceOptions(performanceData);
+            fillContentOptions(contentData);
+            
+            console.log("資料已載入");
+        });
+
+        // 確定按鈕事件處理
+        $("#submitBtn").click(function() {
+            var subject = $("#subject").val();
+            if (!subject) {
+                alert("請先選擇科目");
+                return;
+            }
+            
+            console.log("確定按鈕被點擊");
+            
+            // 收集所有選擇的數據
+            var subjectText = $("#subject option:selected").text();
+            
+            var focusArea = $("#focus-area").val();
+            var focusAreaText = focusArea ? $("#focus-area option:selected").text() : "未選擇";
+            
+            var grade = $("#grade").val();
+            var gradeText = grade ? $("#grade option:selected").text() : "未選擇";
+            
+            // 收集學生優勢項目
+            var strengthItems = [];
+            $("input[name='strength']:checked").each(function() {
+                strengthItems.push($(this).next('label').text());
+            });
+            
+            // 收集學生弱勢項目
+            var weaknessItems = [];
+            $("input[name='weakness']:checked").each(function() {
+                weaknessItems.push($(this).next('label').text());
+            });
+            
+            // 收集核心素養
+            var competencyItems = [];
+            $(".competency-select").each(function() {
+                var value = $(this).val();
+                if (value) {
+                    competencyItems.push($(this).find("option:selected").text());
+                }
+            });
+            
+            // 收集學習表現
+            var performanceItems = [];
+            $(".performance-select").each(function() {
+                var value = $(this).val();
+                if (value) {
+                    performanceItems.push($(this).find("option:selected").text());
+                }
+            });
+            
+            // 收集學習內容
+            var contentItems = [];
+            $(".content-select").each(function() {
+                var value = $(this).val();
+                if (value) {
+                    contentItems.push($(this).find("option:selected").text());
+                }
+            });
+            
+            // 收集素養導向教學檢核
+            var checkItems = [];
+            $("input[name='teaching-check']:checked").each(function() {
+                checkItems.push($(this).next('label').text());
+            });
+            
+            // 填充答案內容
+            var answerHtml = '';
+            
+            // 基本資訊
+            answerHtml += '<div class="answer-item">';
+            answerHtml += '<h3>基本資訊</h3>';
+            answerHtml += '<p><strong>科目：</strong>' + subjectText + '</p>';
+            answerHtml += '<p><strong>年級：</strong>' + gradeText + '</p>';
+            answerHtml += '<p><strong>本領域欲加強的重點：</strong>' + focusAreaText + '</p>';
+            answerHtml += '</div>';
+            
+            // 學生現況
+            answerHtml += '<div class="answer-item">';
+            answerHtml += '<h3>學生現況</h3>';
+            
+            if (strengthItems.length > 0) {
+                answerHtml += '<p><strong>優勢項目：</strong>' + strengthItems.join('、') + '</p>';
+            } else {
+                answerHtml += '<p><strong>優勢項目：</strong>未選擇</p>';
+            }
+            
+            if (weaknessItems.length > 0) {
+                answerHtml += '<p><strong>弱勢項目：</strong>' + weaknessItems.join('、') + '</p>';
+            } else {
+                answerHtml += '<p><strong>弱勢項目：</strong>未選擇</p>';
+            }
+            
+            answerHtml += '</div>';
+            
+            // 核心素養
+            answerHtml += '<div class="answer-item">';
+            answerHtml += '<h3>核心素養</h3>';
+            
+            if (competencyItems.length > 0) {
+                for (var i = 0; i < competencyItems.length; i++) {
+                    answerHtml += '<p><strong>素養' + (i+1) + '：</strong>' + competencyItems[i] + '</p>';
+                }
+            } else {
+                answerHtml += '<p><strong>核心素養：</strong>未選擇</p>';
+            }
+            
+            answerHtml += '</div>';
+            
+            // 學習表現
+            answerHtml += '<div class="answer-item">';
+            answerHtml += '<h3>學習表現</h3>';
+            
+            if (performanceItems.length > 0) {
+                for (var i = 0; i < performanceItems.length; i++) {
+                    answerHtml += '<p><strong>表現' + (i+1) + '：</strong>' + performanceItems[i] + '</p>';
+                }
+            } else {
+                answerHtml += '<p><strong>學習表現：</strong>未選擇</p>';
+            }
+            
+            answerHtml += '</div>';
+            
+            // 學習內容
+            answerHtml += '<div class="answer-item">';
+            answerHtml += '<h3>學習內容</h3>';
+            
+            if (contentItems.length > 0) {
+                for (var i = 0; i < contentItems.length; i++) {
+                    answerHtml += '<p><strong>內容' + (i+1) + '：</strong>' + contentItems[i] + '</p>';
+                }
+            } else {
+                answerHtml += '<p><strong>學習內容：</strong>未選擇</p>';
+            }
+            
+            answerHtml += '</div>';
+            
+            // 素養導向教學檢核
+            answerHtml += '<div class="answer-item">';
+            answerHtml += '<h3>素養導向教學檢核</h3>';
+            
+            if (checkItems.length > 0) {
+                answerHtml += '<ul>';
+                for (var i = 0; i < checkItems.length; i++) {
+                    answerHtml += '<li>' + checkItems[i] + '</li>';
+                }
+                answerHtml += '</ul>';
+            } else {
+                answerHtml += '<p>未選擇任何檢核項目</p>';
+            }
+            
+            answerHtml += '</div>';
+            
+            // 顯示答案區域
+            $("#answer-content").html(answerHtml);
+            $("#overlay").show();
+            $("#answer-section").show();
+            
+            console.log("答案區域已顯示");
+        });
+        
+        // 返回按鈕事件處理
+        $("#return-btn").click(function() {
+            $("#overlay").hide();
+            $("#answer-section").hide();
+            console.log("返回按鈕被點擊");
+        });
+        
+        // 點擊遮罩層也可以返回
+        $("#overlay").click(function() {
+            if ($("#help-modal").is(":visible")) {
+                $("#help-modal").hide();
+            }
+            if ($("#answer-section").is(":visible")) {
+                $("#answer-section").hide();
+            }
+            $("#overlay").hide();
+            console.log("遮罩層被點擊");
+        });
+
+        // ========================= 輔助函數 =========================
+        // 填充下拉選單選項
+        function fillSelectOptions(selector, items) {
+            var $select = $(selector);
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                $select.append('<option value="' + item.value + '">' + item.text + '</option>');
+            }
+        }
+        
+        // 填充年級選項
+        function fillGradeOptions(start, end) {
+            var $grade = $("#grade");
+            for (var i = start; i <= end; i++) {
+                $grade.append('<option value="' + i + '">' + i + '年級</option>');
+            }
+        }
+        
+        // 填充checkbox選項
+        function fillCheckboxItems(items, type) {
+            var $container = $("#" + type + "-container");
+            for (var i = 0; i < items.length; i++) {
+                var item = items[i];
+                var html = '<div class="checkbox-item">' +
+                           '<input type="checkbox" id="' + type + '-' + item.value + '" name="' + type + '" value="' + item.value + '">' +
+                           '<label for="' + type + '-' + item.value + '">' + item.text + '</label>' +
+                           '</div>';
+                $container.append(html);
+            }
+        }
+        
+        // 填充核心素養選項
+        function fillCompetencyOptions(data) {
+            $(".competency-select").each(function() {
+                var $select = $(this);
+                $select.empty().append('<option value="">請選擇核心素養</option>');
+                
+                for (var i = 0; i < data.length; i++) {
+                    var item = data[i];
+                    $select.append('<option value="' + item.id + '">' + item.id + ' ' + item.content + '</option>');
+                }
+            });
+        }
+        
+        // 填充學習表現選項
+        function fillPerformanceOptions(data) {
+            $(".performance-select").each(function() {
+                var $select = $(this);
+                $select.empty().append('<option value="">請選擇學習表現</option>');
+                
+                for (var i = 0; i < data.length; i++) {
+                    var item = data[i];
+                    $select.append('<option value="' + item.id + '">' + item.id + ' ' + item.content + '</option>');
+                }
+            });
+        }
+        
+        // 填充學習內容選項
+        function fillContentOptions(data) {
+            $(".content-select").each(function() {
+                var $select = $(this);
+                $select.empty().append('<option value="">請選擇學習內容</option>');
+                
+                for (var i = 0; i < data.length; i++) {
+                    var item = data[i];
+                    $select.append('<option value="' + item.id + '">' + item.id + ' ' + item.content + '</option>');
+                }
+            });
+        }
+        
+        // 清空已載入的資料
+        function clearLoadedData() {
+            $(".competency-select").each(function() {
+                $(this).empty().append('<option value="">請先載入資料</option>');
+            });
+            
+            $(".performance-select").each(function() {
+                $(this).empty().append('<option value="">請先載入資料</option>');
+            });
+            
+            $(".content-select").each(function() {
+                $(this).empty().append('<option value="">請先載入資料</option>');
+            });
+        }
+    });
+</script>
+</html>
